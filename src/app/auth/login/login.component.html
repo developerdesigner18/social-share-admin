@@ -1,0 +1,29 @@
+<form aria-labelledby="title" class="ng-pristine ng-invalid ng-touched" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="form-control-group" [ngClass]="{ 'has-error': submitted && formControls.email.errors }">
+      <label for="input-email" class="label">Email address:</label>
+      <input nbinput="" fullwidth="" formControlName="email" [class.is-invalid] = "loginForm.get('email').invalid && loginForm.get('email').touched" name="email" id="input-email" placeholder="Email address" fieldsize="large" autofocus="" ng-reflect-full-width="" ng-reflect-field-size="large" ng-reflect-pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2, 4}$" ng-reflect-name="email" ng-reflect-status="basic" ng-reflect-required="true" class="input-full-width size-large status-basic shape-rectangle ng-pristine ng-invalid nb-transition ng-touched" required="" aria-invalid="true" />
+      <div *ngIf="submitted && formControls.email.errors">
+          <div *ngIf="formControls.email.errors.required" class="error">Email is required.</div>
+          <div *ngIf="formControls.email.errors?.pattern" class="error">Email is not valid.</div>
+      </div>
+    </div>
+
+    <div class="form-control-group" [ngClass]="{ 'has-error': formControls.password.errors }">
+      <span class="label-with-link">
+        <label for="input-password" class="label">Password:</label>
+        <a routerlink="../request-password" class="forgot-password caption-2" ng-reflect-router-link="../request-password" href="/request-password">Forgot Password?</a>
+      </span>
+      <input nbinput="" fullwidth="" formControlName="password" name="password" type="password" id="input-password" placeholder="Password" fieldsize="large" ng-reflect-full-width="" ng-reflect-field-size="large" ng-reflect-name="password"ng-reflect-status="basic" ng-reflect-required="true" ng-reflect-minlength="4" ng-reflect-maxlength="50" class="input-full-width size-large status-basic shape-rectangle ng-untouched ng-pristine ng-invalid nb-transition" required="" minlength="4" maxlength="50" />
+      <div *ngIf="submitted && formControls.password.errors">
+				<div *ngIf="formControls.password.errors.required" class="error">Password is required.</div>
+        <div *ngIf="formControls.password.errors.minlength" class="error">Password should be greter then 6 character.</div>
+      </div>
+    </div>
+
+    <div class="form-control-group accept-group">
+      <input type="checkbox" id="term-condition" name="term-condition" (change)="rememberMe($event)" [checked]="remCheck">
+      <span class="text remember_text">Remember me</span>
+    </div>
+
+    <button nbbutton="" fullwidth="" status="primary" size="large" ng-reflect-full-width="" ng-reflect-status="primary" ng-reflect-size="large" ng-reflect-disabled="true" aria-disabled="true" tabindex="-1" class="appearance-filled full-width size-large status-primary shape-rectangle btn-disabled nb-transition full_login_btn"> Log In </button>
+</form>

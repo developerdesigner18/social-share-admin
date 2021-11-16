@@ -1,0 +1,37 @@
+::ng-deep .navigation .link nb-icon {
+    display: none !important;
+  }
+  .custom-checkbox{
+    width: 1.25rem;
+    height: 1.25rem;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 3px;
+    position: relative;
+  }
+  
+  .remember_text{
+    font-family: Open Sans, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+    position: absolute;
+    margin-left: 30px;
+  }
+  
+  .full_login_btn{
+    width: 100%;
+  }
+  
+  .accept-group > input{
+    zoom: 1.4;
+    margin-top: 2px;
+  }
+  .error { color: red; }
+  
+  .img-logo{
+    width: 45%;
+    display: flex;
+    margin: 0 auto;
+  }
+  
