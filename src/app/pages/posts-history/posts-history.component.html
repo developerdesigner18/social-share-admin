@@ -1,0 +1,13 @@
+<nb-card>
+  <nb-card-header>
+    <button class="btn btn-primary" [routerLink]="['/pages/posts']"><i
+        class="far fa-arrow-alt-circle-left"></i></button>
+    Community Post History
+  </nb-card-header>
+
+  <nb-card-body>
+    <ng2-smart-table [settings]="settings" [source]="source" (custom)="onCustom($event)"
+      (editConfirm)="onEditConfirm($event)" (deleteConfirm)="onDeleteConfirm($event)">
+    </ng2-smart-table>
+  </nb-card-body>
+</nb-card>
