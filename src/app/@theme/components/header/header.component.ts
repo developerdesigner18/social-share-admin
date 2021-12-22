@@ -5,6 +5,8 @@ import { UserData } from '../../../@core/data/users';
 import { LayoutService } from '../../../@core/utils';
 import { map, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { AuthService } from '../../../auth.service';
+
 
 @Component({
   selector: 'ngx-header',
@@ -45,11 +47,22 @@ export class HeaderComponent implements OnInit, OnDestroy {
               private themeService: NbThemeService,
               private userService: UserData,
               private layoutService: LayoutService,
-              private breakpointService: NbMediaBreakpointsService) {
+              private breakpointService: NbMediaBreakpointsService,
+              private authService: AuthService) {
+
+          this.menuService.onItemClick()
+          .subscribe((event) => {
+            this.changeNavigation(event.item.title)
+          });
   }
 
   ngOnInit() {
-    this.currentTheme = this.themeService.currentTheme;
+    var theme = localStorage.getItem('adminTheme')
+    if(theme){
+      this.themeService.changeTheme(theme);
+    } else {
+      this.currentTheme = this.themeService.currentTheme;
+    }
     var main_users = {
       name: 'Michel lambart',
       picture: 'assets/images/nick.png'
@@ -78,7 +91,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   changeTheme(themeName: string) {
+    var data = localStorage.getItem('adminUser')
+    console.log("data", JSON.parse(data).data._id)
     this.themeService.changeTheme(themeName);
+    this.authService.changeTheme(JSON.parse(data).data._id, themeName).subscribe((res) => {
+      if(res.success === true){
+        localStorage.setItem('adminTheme', themeName)
+      }
+    })
   }
 
   toggleSidebar(): boolean {
@@ -86,6 +106,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.layoutService.changeLayoutSize();
 
     return false;
+  }
+
+  changeNavigation(value){
+    console.log("value", value)
+    if(value == 'Log out'){
+      this.authService.logOut()
+    }
   }
 
   navigateHome() {

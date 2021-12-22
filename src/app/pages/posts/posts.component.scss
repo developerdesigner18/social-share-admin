@@ -1,3 +1,4 @@
+@import '@ctrl/ngx-emoji-mart/picker.css';
 .cdk-overlay-pane.my-dialog {
     position: relative!important;
   }
@@ -38,7 +39,7 @@
   a.cancel_btn {
     position: absolute;
     right: 40px;
-    top: 11px;
+    top: 9em;
     cursor: pointer;
     padding: 0px;
     background: #ffffff8a;
@@ -133,6 +134,7 @@
 }
 emoji-mart.emoji-mart {
     position: fixed;
+    z-index: 99;
 }
 .emoji_btn span:hover {
     text-shadow: 0 0 3px black;

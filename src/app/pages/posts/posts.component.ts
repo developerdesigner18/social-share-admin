@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject, ViewChild, ElementRef, QueryList, ViewChildren } from '@angular/core';
-import { NbToastrService } from '@nebular/theme';
+import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { LocalDataSource } from 'ng2-smart-table';
 import { SmartTableData } from '../../@core/data/smart-table';
 import { AuthService } from '../../auth.service';
@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import { MatDialogRef, MAT_DIALOG_DATA } from  '@angular/material/dialog';
 import {NgxImageCompressService} from 'ngx-image-compress';
+import { ShowcaseDialogComponent } from '../modal-overlays/dialog/showcase-dialog/showcase-dialog.component';
 declare var jQuery: any;
 declare var $: any;
 
@@ -19,6 +20,7 @@ declare var $: any;
 export class PostsComponent implements OnInit {
 
   @ViewChild('postMsg') postMesssgeElement: any;
+  @ViewChild('postDate') postDateElement: any;
   @ViewChildren('postImage') postImageElement: QueryList<ElementRef>;
   fileData: Array<File> = [];
   fileCovToReturn: Array<File> = [];
@@ -33,6 +35,8 @@ export class PostsComponent implements OnInit {
   arrayfile: any = [];
   temp_images:any = [];
   token: string;
+  chooseType: string;
+  pickDate: any;
 
   message: any;
   showEmojiPicker = false;
@@ -51,14 +55,18 @@ export class PostsComponent implements OnInit {
   constructor(private service: SmartTableData, private authservice: AuthService, private toastrService: NbToastrService,
     private dialogRef: MatDialogRef<PostsComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any, 
-    private imageCompress: NgxImageCompressService) { 
+    private imageCompress: NgxImageCompressService, private route: ActivatedRoute, private dialogService: NbDialogService) { 
     
   }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      if(params.id){
+        this.restoreData(params.id)
+      }
+   });
   }
   toggleEmojiPicker() {
-    console.log(this.showEmojiPicker);
         this.showEmojiPicker = !this.showEmojiPicker;
   }
   addEmoji(event) {
@@ -71,14 +79,11 @@ export class PostsComponent implements OnInit {
     this.showEmojiPicker = false;
   }
   onBlur() {
-    console.log('onblur')
   }
 
   async openNewDialog(event: any) {
-    console.log("event files", event.target.files)    
     this.fileData = Array.from(event.target.files)
     const data = await this.FiletoBase64(event)
-    console.log("open data", data)
     this.images = data
     this.MainImageProcess(event)
   }
@@ -97,7 +102,21 @@ export class PostsComponent implements OnInit {
     }
     $(".set_view_more").css('display', 'none');
     this.shows = false
-    this.toastrService.info("All images are removed. Please select new ones")
+  }
+
+  restoreData(id){
+    console.log("id", id)
+  }
+
+  open() {
+    this.dialogService.open(ShowcaseDialogComponent, {
+      context: {
+        title: 'Preview Post',
+        desc: this.postMesssgeElement.nativeElement.value,
+        type: this.chooseType,
+        images: this.temp_images
+      },
+    });
   }
 
   FiletoBase64(event){
@@ -107,7 +126,6 @@ export class PostsComponent implements OnInit {
       const readers = new FileReader();
       readers.readAsDataURL(file);
       readers.onload = () => {
-        // console.log(readers.result);
         data.push(readers.result)
       };
       if (i === event.target.files.length - 1)
@@ -136,20 +154,17 @@ export class PostsComponent implements OnInit {
             this.images.sort((img1, img2) => img1.length > img2.length ? 1 : -1)
           }
           reader.readAsDataURL(event.target.files[i]);
-          console.log("this.arrayfile", this.arrayfile)
           this.arrayfile.splice(Object.keys(this.fileData).length, 0, event.target.files[i])
           this.arrayfile.sort((fileA, fileB) => fileA.size > fileB.size ? 1 : -1)
         }
         this.arrayfile = this.fileData.filter(item => item)
       }else{
-        console.log("this.fileData", this.fileData)
         this.arrayfile = this.fileData
         var orientation = -1;
         for (let i = 0; i < filesAmount; i++) {
           var reader = new FileReader();
 
           reader.onload = (event: any) => {
-            // console.log("image", event.target.result)
             if (event.target.result.split(';')[0] == 'data:video/mp4' || event.target.result.split(';')[0] == 'data:video/avi') {
               this.temp_images.push({data: 'video', src: event.target.result})
               this.images.push(event.target.result);
@@ -158,14 +173,13 @@ export class PostsComponent implements OnInit {
               this.imageCompress.compressFile(event.target.result, orientation, 75, 50).then(
                 result => {
                   console.warn('Size in bytes is now:', this.imageCompress.byteCount(result));
-                  console.log("temp_images", this.temp_images)
                   this.images.push(result);
                 });
               }
+              this.shows = true
               this.images.sort((img1, img2) => img1.length > img2.length ? 1 : -1)
           }
           reader.readAsDataURL(event.target.files[i]);
-          console.log("this.arrayfile", this.arrayfile)
           // this.arrayfile.splice(Object.keys(this.fileData).length, 0, event.target.files[i])
           this.arrayfile.sort((fileA, fileB) => fileA.size > fileB.size ? 1 : -1)
         }
@@ -175,14 +189,8 @@ export class PostsComponent implements OnInit {
 
   postSave(){
     this.token = localStorage.getItem('admintoken')
-    if (this.postImageElement.length !== 0) {        
-      if(this.fileData[0] !== undefined)
-      {
-        this.arrayfile = this.fileData[0]
-      }else{
+    if (this.postImageElement.length !== 0) {          
         this.arrayfile = this.fileData
-        }
-      
       let arrayRemoveNull = this.arrayfile.filter(e => e)
       if (arrayRemoveNull[0].name.split('.').pop() !== 'png') {
           for (let i = 0; i < arrayRemoveNull.length; i++){
@@ -194,12 +202,16 @@ export class PostsComponent implements OnInit {
             reader.readAsDataURL(this.fileCovToReturn[i]);
           }
         } else {
-          // this.toastr.info("png format is not supported used other format like jpg or jpeg")
           this.toastrService.success("png format is not supported used other format like jpg or jpeg")
         }
         reader.onload = (_event) => {
-          this.authservice.newPost(this.token, this.postMesssgeElement.nativeElement.value, this.fileCovToReturn).pipe().subscribe((res) => {
-            console.log("res", res)
+          this.authservice.newPost(this.token, this.postMesssgeElement.nativeElement.value, this.fileCovToReturn, this.postDateElement.nativeElement.value, this.chooseType).pipe().subscribe((res) => {
+            if(res.success == true){
+              window.location.reload()
+              this.toastrService.success("Post created successfully")
+            } else {  
+              this.toastrService.danger("Oops some error occured")
+            }
           })
         }
     } else {
@@ -207,8 +219,13 @@ export class PostsComponent implements OnInit {
       if(this.postMesssgeElement.nativeElement.value == ''){
         this.toastrService.info("You are not set description!")
       }else if(this.postMesssgeElement.nativeElement.value.valid !== ''){
-        this.authservice.newtextPost(this.token, this.postMesssgeElement.nativeElement.value).subscribe((res) => {
-          console.log("res", res)
+        this.authservice.newtextPost(this.token, this.postMesssgeElement.nativeElement.value, this.postDateElement.nativeElement.value.split("-").reverse().join("-"), this.chooseType).subscribe((res) => {
+          if(res.success == true){
+            window.location.reload()
+            this.toastrService.success("Post created successfully")
+          } else {  
+            this.toastrService.danger("Oops some error occured")
+          }
         })
       }
     }

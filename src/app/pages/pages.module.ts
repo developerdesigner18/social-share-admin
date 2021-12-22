@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
-import { NbMenuModule } from '@nebular/theme';
+import { NbDatepickerModule, NbMenuModule } from '@nebular/theme';
 
 import { ThemeModule } from '../@theme/theme.module';
 import { PagesComponent } from './pages.component';
@@ -13,6 +13,8 @@ import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/materia
 import {NgxImageCompressService} from 'ngx-image-compress'; 
 import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { PostsHistoryModule } from './posts-history/posts-history.module';
+import {RouterModule} from '@angular/router';
 @NgModule({
   imports: [
     PagesRoutingModule,
@@ -26,7 +28,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     MatDialogModule,
     PickerModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NbDatepickerModule.forRoot(),
+    PostsHistoryModule,
+    RouterModule
   ],
   declarations: [
     PagesComponent,

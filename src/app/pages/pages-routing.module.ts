@@ -8,6 +8,7 @@ import { NotFoundComponent } from './miscellaneous/not-found/not-found.component
 import { UsersComponent } from './users/users.component';
 import { PostsComponent } from './posts/posts.component';
 import { AuthGuard } from '../auth.guard';
+import { PostsHistoryComponent } from './posts-history/posts-history.component';
 
 const routes: Routes = [{
   path: '',
@@ -29,6 +30,10 @@ const routes: Routes = [{
     {
       path: 'posts',
       component: PostsComponent
+    },
+    {
+      path: 'posts-history',
+      component: PostsHistoryComponent
     },
     {
       path: 'layout',

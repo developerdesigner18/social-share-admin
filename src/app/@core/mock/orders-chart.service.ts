@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { PeriodsService } from './periods.service';
 import { OrdersChart, OrdersChartData } from '../data/orders-chart';
+import { AuthService } from '../../auth.service';
+import { finalize } from 'rxjs/operators';
 
 @Injectable()
 export class OrdersChartService extends OrdersChartData {
@@ -16,12 +18,12 @@ export class OrdersChartService extends OrdersChartData {
   ];
 
   private data = { };
-
-  constructor(private period: PeriodsService) {
+  private custom_data: any
+  constructor(private period: PeriodsService, private authService: AuthService) {
     super();
     this.data = {
-      week: this.getDataForWeekPeriod(),
       month: this.getDataForMonthPeriod(),
+      week: this.getDataForWeekPeriod(),
       year: this.getDataForYearPeriod(),
     };
   }
@@ -63,42 +65,34 @@ export class OrdersChartService extends OrdersChartData {
 
   private getDataForMonthPeriod(): OrdersChart {
     return {
-      chartLabel: this.getDataLabels(47, this.period.getMonths()),
+      chartLabel: this.getDataLabels(12, this.period.getMonths()),
       linesData: [
         [
-          5, 63, 113, 156, 194, 225,
-          250, 270, 283, 289, 290,
-          286, 277, 264, 244, 220,
-          194, 171, 157, 151, 150,
-          152, 155, 160, 166, 170,
-          167, 153, 135, 115, 97,
-          82, 71, 64, 63, 62, 61,
-          62, 65, 73, 84, 102,
-          127, 159, 203, 259, 333,
         ],
         [
-          6, 83, 148, 200, 240,
-          265, 273, 259, 211,
-          122, 55, 30, 28, 36,
-          50, 68, 88, 109, 129,
-          146, 158, 163, 165,
-          173, 187, 208, 236,
-          271, 310, 346, 375,
-          393, 400, 398, 387,
-          368, 341, 309, 275,
-          243, 220, 206, 202,
-          207, 222, 247, 286, 348,
+          6,
+          265,
+          122,
+          50,
+          146, 
+          173, 
+          271, 
+          393, 
+          368, 
+          243, 
+          207,
+          101
         ],
-        [
-          398, 348, 315, 292, 274,
-          261, 251, 243, 237, 231,
-          222, 209, 192, 172, 152,
-          132, 116, 102, 90, 80, 71,
-          64, 58, 53, 49, 48, 54, 66,
-          84, 104, 125, 142, 156, 166,
-          172, 174, 172, 167, 159, 149,
-          136, 121, 105, 86, 67, 45, 22,
-        ],
+        // [
+        //   398, 348, 315, 292, 274,
+        //   261, 251, 243, 237, 231,
+        //   222, 209, 192, 172, 152,
+        //   132, 116, 102, 90, 80, 71,
+        //   64, 58, 53, 49, 48, 54, 66,
+        //   84, 104, 125, 142, 156, 166,
+        //   172, 174, 172, 167, 159, 149,
+        //   136, 121, 105, 86, 67, 45, 22,
+        // ],
       ],
     };
   }
@@ -138,6 +132,46 @@ export class OrdersChartService extends OrdersChartData {
     };
   }
 
+  private customData(value): OrdersChart {
+    
+      return {
+        chartLabel: this.getDataLabels(12, this.period.getMonths()),
+        linesData: [
+          [
+          ],
+          value,
+          // [
+          //   398, 348, 315, 292, 274,
+          //   261, 251, 243, 237, 231,
+          //   222, 209, 192, 172, 152,
+          //   132, 116, 102, 90, 80, 71,
+          //   64, 58, 53, 49, 48, 54, 66,
+          //   84, 104, 125, 142, 156, 166,
+          //   172, 174, 172, 167, 159, 149,
+          //   136, 121, 105, 86, 67, 45, 22,
+          // ],
+        ],
+      };
+    
+  }
+
+  private postData(value): OrdersChart {
+    
+      return {
+        chartLabel: this.getDataLabels(12, this.period.getMonths()),
+        linesData: [
+          [
+          ],
+          [
+            
+          ],
+          value,,
+        ],
+      };
+    
+  }
+
+
   getDataLabels(nPoints: number, labelsArray: string[]): string[] {
     const labelsArrayLength = labelsArray.length;
     const step = Math.round(nPoints / labelsArrayLength);
@@ -149,7 +183,11 @@ export class OrdersChartService extends OrdersChartData {
     });
   }
 
-  getOrdersChartData(period: string): OrdersChart {
-    return this.data[period];
+  getOrdersChartData(period: string, value: string): OrdersChart {
+    if(value === 'user'){
+      return this.customData(period);
+    } else {
+      return this.postData(period);
+    }
   }
 }

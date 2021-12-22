@@ -7,6 +7,7 @@ import {
 } from '@angular/common/http';
 import { environment } from '../environments/environment';
 // import { environment } from '../environments/environment.prod';
+import { NbToastrService } from '@nebular/theme';
 
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -22,7 +23,7 @@ export class AuthService {
 
   constructor(private httpClient: HttpClient,
     public router: Router,
-    private injector: Injector) { }
+    private injector: Injector, private toastrService: NbToastrService) { }
 
     redirectUrl: string;
 
@@ -34,32 +35,38 @@ export class AuthService {
         })
         .pipe(
           map((user) => {
-            if (user && user.token) {
-              localStorage.setItem('currentUser', JSON.stringify(user));
-              localStorage.setItem('token', user.token);
+            if (user && user.token && user.data.type === 'admin') {
+              localStorage.setItem('adminUser', JSON.stringify(user));
+              localStorage.setItem('admintoken', user.token);
               this.router.navigate(['/pages/dashboard'])
+            } else {
+              this.toastrService.danger('You have not authorized to login admin panel.')
             }
             return user || {};
           }),
           catchError(this.handleError.bind(this))
         );
     }
-    newPost(u_token, msg, imgUrl): Observable<any> {
+    newPost(u_token, msg, imgUrl, valid, type): Observable<any> {
       const formData: any = new FormData();
       formData.append('description', msg);
+      formData.append('valid', valid);
+      formData.append('type', type);
       for (let i = 0; i < imgUrl.length; i++) {
         formData.append('Url', imgUrl[i]);
       }
   
-      return this.httpClient.post(`${environment.apiUrl}/api/photos/newPosts`, formData, { headers: { token: u_token } }).pipe(
+      return this.httpClient.post(`${environment.apiUrl}/api/photos/newCommunityPosts`, formData, { headers: { token: u_token } }).pipe(
         catchError(this.handleError)
       )
     }
 
-    newtextPost(u_token, msg): Observable<any> {
+    newtextPost(u_token, msg, valid, type): Observable<any> {
       const formData: any = new FormData();
       formData.append('description', msg);
-      return this.httpClient.post(`${environment.apiUrl}/api/photos/newPosts`, formData, { headers: { token: u_token } }).pipe(
+      formData.append('valid', valid);
+      formData.append('type', type);
+      return this.httpClient.post(`${environment.apiUrl}/api/photos/newCommunityPosts`, formData, { headers: { token: u_token } }).pipe(
         map((res: Response) => {
           return res || {}
         }),
@@ -68,7 +75,7 @@ export class AuthService {
     }
 
     checktoken(){
-      if (localStorage.getItem('token')) {
+      if (localStorage.getItem('admintoken')) {
         this.router.navigate(['/pages/dashboard'])
         return true;
       }
@@ -76,7 +83,7 @@ export class AuthService {
     }
 
     isLoggedIn() {
-      if (localStorage.getItem('currentUser')) {
+      if (localStorage.getItem('adminUser')) {
         return true;
       }
       return false;
@@ -108,44 +115,75 @@ export class AuthService {
       );
     }
 
+    getCommunityPosts(): Observable<any>{
+      return this.httpClient
+      .get(`${environment.apiUrl}/api/admin/getAllCommunityPosts`, {
+        headers: this.headers,
+      })
+      .pipe(
+        map((res: Response) => {
+          return res || {};
+        }),
+        catchError(this.handleError)
+      );
+    }
+
+    deleteCommunityPosts(postId): Observable<any>{
+      return this.httpClient
+      .post(`${environment.apiUrl}/api/admin/deletecommunityPost`, { headers: this.headers, postId: postId })
+      .pipe(
+        map((res: Response) => {
+          return res || {};
+        }),
+        catchError(this.handleError)
+      );
+    }
+
+    changeTheme(id, data): Observable<any> {
+      return this.httpClient.post(`${environment.apiUrl}/api/user/theme`, { id: id, data: data }).pipe(
+        map((res) => {
+          return res
+        }),
+        catchError(this.handleError)
+      )
+    }
+
+    getUserMonthData(data): Observable<any>{
+      return this.httpClient
+      .post(`${environment.apiUrl}/api/user/getUserMonthData`, {date: data})
+      .pipe(
+        map((res: Response) => {
+          return res || {};
+        }),
+        catchError(this.handleError)
+      );
+    }
+    getPostMonthData(data): Observable<any>{
+      return this.httpClient
+      .post(`${environment.apiUrl}/api/photos/getPostMonthData`, {date: data})
+      .pipe(
+        map((res: Response) => {
+          return res || {};
+        }),
+        catchError(this.handleError)
+      );
+    }
+
+    logOut(): any{
+      localStorage.removeItem('adminUser');
+      localStorage.removeItem('admintoken');
+      // window.location.replace('');
+      this.router.navigate(['login'])
+    }
+    
     private handleError(error: HttpErrorResponse) {
       let msg = '';
-      if (
-        error.error.message ==
-        'friend request already sent or recive either you are already friends'
-      ) {
-        // alert('Request already send')
-        // this.toastr.info('Request already send');
-      } else if (
-        error.error.success == false &&
-        error.error.message == 'email in not registered'
-      ) {
-        // this.dialog.open(DialogEmailErrorComponent, {
-        //   width: '500px',
-        // });
-      }
-      if (error.error instanceof ErrorEvent) {
-        console.error('An error occurred:', error.error.message);
-        (msg = 'An error occurred:'), error.error.message;
+      if(error.status === 500){
+        this.toastrService.danger('Authentication is failed. Please check your email and paswword.')
+      } else if(error.status === 422){
+        this.toastrService.danger('Email id is already exist.')
       } else {
-        console.error(
-          `Backend returned code ${error.status}, ` +
-            `body was: ${error.error.message}`
-        );
-        msg =
-          'Backend returned code ${error.status}, ` + `body was: ${error.error.message}';
-        if (error.status == 500) {
-          // this.toastr.error(
-          //   'Authentication is failed. Please check your email and paswword.'
-          // );
-        } else if (error.status == 422) {
-          // this.toastr.error('Email id is already exist.');
-          // this.dialog.open(DialogErrorComponent, {
-          //   width: '500px'
-          // })
-        } else {
-          console.error('some error occured', error.error.message);
-        }
+        this.toastrService.danger('Error occured!')
       }
       return throwError(msg);
     }

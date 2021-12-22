@@ -1,46 +1,72 @@
-<nb-card>
+<nb-card accent="primary">
     <nb-card-header>
-      Create Community Posts
-    </nb-card-header>
-  
-    <nb-card-body>
-      <div>
-        <div>
-            <textarea nbInput fullWidth #postMsg name="Text1" style="resize: none !important;background: aliceblue;resize: none;"
-                cols="40" rows="5" placeholder="Write about community post!" (blur)="onBlur()" (focus)="onFocus()" [(ngModel)]="message"
-                style="width: 100%; height: 100%; border: none; padding: 8px; min-height: 100px; max-height: 100px;"
-                required></textarea>
-            <button class="emoji_btn" (click)="toggleEmojiPicker()"><span style="font-size: 1.5em;color: #3366ff;"> <i class="far fa-smile-beam"></i> </span></button><br>
-            <span class="emoji_box">
-                <emoji-mart class="emoji-mart" set="{{set}}" *ngIf="showEmojiPicker" (emojiSelect)="addEmoji($event)" title="Pick your emoji…"></emoji-mart>
+        <div class="d-flex justify-content-between">
+            <h4>
+                Create Community Posts
+            </h4>
+            <span>
+                <a [routerLink]="['/pages/posts-history']">History</a>
             </span>
         </div>
-        <div class="text-center load_new_image" id="load_new_image_id">
-            <ng-container>
-                <a *ngIf="shows" class="cancel_btn" (click)="cancel()"><nb-icon icon="close-outline"></nb-icon> </a>
-                <span *ngFor="let image of temp_images; let i = index;">
-                    <img #postImage *ngIf="image.data == 'img'" class="change_width" style="width: 100%; height: 130px;"
-                        [src]="image.src" />
-                    <video #postImage controls *ngIf="image.data == 'video'" class="change_width"
-                        style="width: 100%; height: 130px;" [src]="image.src"></video>
+    </nb-card-header>
+
+    <nb-card-body>
+        <div>
+            <div>
+                <textarea nbInput fullWidth #postMsg name="Text1"
+                    style="resize: none !important;background: aliceblue;resize: none;" cols="40" rows="5"
+                    placeholder="Write about community post!" (blur)="onBlur()" (focus)="onFocus()"
+                    [(ngModel)]="message"
+                    style="width: 100%; height: 100%; border: none; padding: 8px; min-height: 100px; max-height: 100px;"
+                    required></textarea>
+                <button class="emoji_btn" (click)="toggleEmojiPicker()"><span style="font-size: 1.5em;color: #3366ff;">
+                        <i class="far fa-smile-beam"></i> </span></button><br>
+                <span class="emoji_box">
+                    <emoji-mart class="emoji-mart" set="{{set}}" *ngIf="showEmojiPicker"
+                        (emojiSelect)="addEmoji($event)" title="Pick your emoji…"></emoji-mart>
                 </span>
-            </ng-container>
-        </div> 
-    </div>
-    <br />
-    <input type="file" style="display:none" #file class="btn btn-primary" (change)="openNewDialog($event)"
-        multiple="" />
-    <div style="border: 1px solid #000000; border-radius: 6px; margin: 5px 0px 10px 0px; padding: 5px;cursor: pointer;"
-        (click)="file.click();">
-        <!-- <img src='/assets/images/photos.png' style="width: 5%; float: right; margin-top: -2px;"
-            class="create_post_photo_icon" /> -->
+            </div>
+            <div class="text-center load_new_image" id="load_new_image_id">
+                <ng-container>
+                    <a *ngIf="shows" class="cancel_btn" (click)="cancel()">
+                        <nb-icon icon="close-outline"></nb-icon>
+                    </a>
+                    <span *ngFor="let image of temp_images; let i = index;">
+                        <img #postImage *ngIf="image.data == 'img'" class="change_width"
+                            style="width: 100%; height: 130px;" [src]="image.src" />
+                        <video #postImage controls *ngIf="image.data == 'video'" class="change_width"
+                            style="width: 100%; height: 130px;" [src]="image.src"></video>
+                    </span>
+                </ng-container>
+            </div>
+            <div class="simple_form d-flex justify-content-between">
+                <div class="time_valid">
+                    <!-- <input #postDate type="date" name="" id=""> -->
+                    <input nbInput #postDate placeholder="Expire Post Date" [(ngModel)]="pickDate"
+                        [nbDatepicker]="datepicker">
+                    <nb-datepicker #datepicker></nb-datepicker>
+                </div>
+                <div class="choose_type">
+                    <nb-select name="type" placeholder="Select options" [(ngModel)]="chooseType" required>
+                        <nb-option value="community">Community</nb-option>
+                        <nb-option value="promotion">Promotion</nb-option>
+                    </nb-select>
+                </div>
+                <button nbButton (click)="open()">preview</button>
+            </div>
+        </div>
+        <br />
+        <input type="file" style="display:none" #file class="btn btn-primary" (change)="openNewDialog($event)"
+            multiple="" />
+        <div style="border: 1px solid #000000; border-radius: 6px; margin: 5px 0px 10px 0px; padding: 5px;cursor: pointer;"
+            (click)="file.click();">
             <nb-icon icon="color-palette-outline" style="width: 5%; float: right; margin-top: 2px;"
-            class="create_post_photo_icon"></nb-icon>
-        <h6 style="margin-bottom: 0px; ">Upload Photos/Videos</h6>
-    </div>
-    <div>
-        <button type="button" class="btn btn-primary" style="width: 100%;background: #0a1221;border: 0;"
-            (click)="postSave()">Post</button>
-    </div>
+                class="create_post_photo_icon"></nb-icon>
+            <h6 style="margin-bottom: 0px; ">Upload Photos/Videos</h6>
+        </div>
+        <div>
+            <button type="button" class="btn btn-primary" style="width: 100%;background: #0a1221;border: 0;"
+                (click)="postSave()">Post</button>
+        </div>
     </nb-card-body>
-  </nb-card>
+</nb-card>

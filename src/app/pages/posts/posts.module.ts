@@ -12,10 +12,13 @@ import {
   NbSelectModule,
   NbListModule,
   NbInputModule,
+  NbDatepickerModule,
+  NbDialogModule,
 } from '@nebular/theme';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -36,7 +39,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     MatDialogModule,
     PickerModule,
     FormsModule, 
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NbDatepickerModule,
+    RouterModule,
+    NbDialogModule.forChild()
   ],
   providers: [
     {

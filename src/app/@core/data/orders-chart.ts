@@ -4,5 +4,5 @@ export interface OrdersChart {
 }
 
 export abstract class OrdersChartData {
-  abstract getOrdersChartData(period: string): OrdersChart;
+  abstract getOrdersChartData(period: string, value: string): OrdersChart;
 }

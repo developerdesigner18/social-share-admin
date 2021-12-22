@@ -2,7 +2,7 @@
   <nb-tabset fullWidth (changeTab)="changeTab($event)">
     <nb-tab tabTitle="Users">
       <div class="chart-container">
-        <ngx-chart-panel-summary [summary]="chartPanelSummary"></ngx-chart-panel-summary>
+        <!-- <ngx-chart-panel-summary [summary]="chartPanelSummary"></ngx-chart-panel-summary> -->
         <ngx-chart-panel-header [type]="period"
                                 (periodChange)="setPeriodAndGetChartData($event)">
         </ngx-chart-panel-header>
@@ -11,11 +11,11 @@
     </nb-tab>
     <nb-tab tabTitle="Posts" [lazyLoad]="true">
       <div class="chart-container">
-        <ngx-chart-panel-summary [summary]="chartPanelSummary"></ngx-chart-panel-summary>
+        <!-- <ngx-chart-panel-summary [summary]="chartPanelSummary"></ngx-chart-panel-summary> -->
         <ngx-chart-panel-header [type]="period"
                                 (periodChange)="setPeriodAndGetChartData($event)">
         </ngx-chart-panel-header>
-        <ngx-orders-chart #ordersChart [ordersChartData]="ordersChartData"></ngx-orders-chart>
+        <ngx-orders-chart #ordersChart [ordersChartData]="postChartData"></ngx-orders-chart>
       </div>
     </nb-tab>
   </nb-tabset>
