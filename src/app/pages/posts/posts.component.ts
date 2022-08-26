@@ -40,6 +40,7 @@ export class PostsComponent implements OnInit {
 
   message: any;
   showEmojiPicker = false;
+  filterFn = (date) => date.getDay() === 0;
   sets = [
     'native',
     'google',
@@ -56,7 +57,6 @@ export class PostsComponent implements OnInit {
     private dialogRef: MatDialogRef<PostsComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any, 
     private imageCompress: NgxImageCompressService, private route: ActivatedRoute, private dialogService: NbDialogService) { 
-    
   }
 
   ngOnInit(): void {

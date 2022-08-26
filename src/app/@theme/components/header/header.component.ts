@@ -109,7 +109,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   changeNavigation(value){
-    console.log("value", value)
     if(value == 'Log out'){
       this.authService.logOut()
     }
